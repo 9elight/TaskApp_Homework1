@@ -1,34 +1,50 @@
 package com.taskapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class Form_Activity extends AppCompatActivity {
-    private Button saveButton;
-    private EditText aTask;
-    private  EditText description;
+
+    private EditText editTitle;
+    private EditText description;
+    Task task;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form_);
-       saveButton = findViewById(R.id.saveButton);
-       aTask = findViewById(R.id.task);
-       description = findViewById(R.id.description);
-       saveButton.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Intent intent = new Intent(Form_Activity.this,MainActivity.class);
-               intent.putExtra("task",aTask.getText().toString());
-               intent.putExtra("description",description.getText().toString());
-               startActivity(intent);
-               finish();
-           }
-       });
+
+        editTitle = findViewById(R.id.editTitle);
+        description = findViewById(R.id.description);
+        task = (Task) getIntent().getSerializableExtra("HomeFragmentTask");
+        if (task != null){
+
+            editTitle.setText(task.getTitle(),TextView.BufferType.EDITABLE);
+            description.setText(task.getDesc(),TextView.BufferType.EDITABLE);}
+        }
+
+
+
+
+
+    public void onSave(View view) {
+        String title = editTitle.getText().toString().trim();
+        String desc = description.getText().toString().trim();
+        Intent intent = new Intent();
+        Task task = new Task(title, desc);
+        intent.putExtra("task", task);
+        setResult(RESULT_OK, intent);
+        finish();
 
     }
+
+
 }
