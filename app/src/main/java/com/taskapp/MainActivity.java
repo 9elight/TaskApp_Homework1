@@ -1,6 +1,8 @@
 package com.taskapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.taskapp.onBoard.OnBoardActivity;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -33,6 +36,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences preferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        boolean isShown = preferences.getBoolean("isShown", false);
+        if (!isShown){
+            startActivity(new Intent(this, OnBoardActivity.class));
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

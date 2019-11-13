@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
     private TaskAdapter adapter;
     private List<Task> list;
     private Task task;
-    Form_Activity form_activity;
     private int pos;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
