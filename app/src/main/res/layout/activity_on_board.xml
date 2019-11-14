@@ -11,25 +11,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-<Button
-    android:id="@+id/skipButton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="skip"
-    android:layout_alignRight="@id/viewPager"
-    android:onClick="skipBtnClick"
-    android:background="@color/btnsColor"
+    <TextView
+        android:id="@+id/skipButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/viewPager"
+        android:onClick="skipBtnClick"
+        android:text="skip"
+        android:textColor="@color/btnsColor"
+        android:textSize="24sp"
 
-    />
+        />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/viewPager"
         app:tabBackground="@drawable/tab_selector"
         app:tabGravity="center"
-        app:tabIndicatorHeight="0dp"
-        android:layout_alignBottom="@id/viewPager"/>
+        app:tabIndicatorHeight="0dp" />
 
 
 </RelativeLayout>

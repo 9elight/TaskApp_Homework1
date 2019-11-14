@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -39,7 +40,7 @@ public class BoardFragment extends Fragment {
         TextView textView2 = view.findViewById(R.id.textView2);
         ImageView imageView = view.findViewById(R.id.imageView);
         Button buttonStart = view.findViewById(R.id.buttonStart);
-        Button buttonSkip = getActivity().findViewById(R.id.skipButton);
+
 
         textView.setText("Привет");
 
@@ -52,25 +53,24 @@ public class BoardFragment extends Fragment {
                 textView2.setText("Описание");
                 imageView.setImageResource(R.drawable.earth);
                 buttonStart.setVisibility(View.INVISIBLE);
-                buttonSkip.setVisibility(View.VISIBLE);
-                view.setBackgroundColor(getResources().getColor(R.color.background1));
+                view.setBackgroundResource(R.drawable.backgrround_gradient1);
                 break;
             case 1:
                 textView.setText("Как дела?");
                 textView2.setText("Описание");
                 imageView.setImageResource(R.drawable.moon);
                 buttonStart.setVisibility(View.INVISIBLE);
-                buttonSkip.setVisibility(View.VISIBLE);
+
                 view.setBackgroundColor(Color.CYAN);
-                view.setBackgroundColor(getResources().getColor(R.color.background2));
+                view.setBackgroundResource(R.drawable.backgrround_gradient2);
                 break;
             case 2:
                 textView.setText("Что делаешь?");
                 textView2.setText("Описание");
                 imageView.setImageResource(R.drawable.mars);
                 view.setBackgroundColor(Color.RED);
-                view.setBackgroundColor(getResources().getColor(R.color.background3));
-                buttonSkip.setVisibility(View.INVISIBLE);
+                view.setBackgroundResource(R.drawable.backgrround_gradient3);
+
                 break;
         }
         buttonStart.setOnClickListener(new View.OnClickListener() {
