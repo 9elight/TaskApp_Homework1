@@ -1,8 +1,12 @@
 package com.taskapp.ui.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +24,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.taskapp.App;
 import com.taskapp.Form_Activity;
 import com.taskapp.R;
 import com.taskapp.Task;
@@ -27,18 +32,26 @@ import com.taskapp.TaskAdapter;
 import com.taskapp.interfaces.OnItemClickListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment {
 
+
     private HomeViewModel homeViewModel;
     private RecyclerView recyclerView;
-    private TaskAdapter adapter;
-    private List<Task> list;
-    private Task task;
-    private int pos;
+    private static TaskAdapter adapter;
+    private static List<Task> list;
+
+    private static int pos;
+    private static List<Task> sortedList;
+    private static List<Task> notSortedList;
+
+
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,54 +59,134 @@ public class HomeFragment extends Fragment {
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerView = root.findViewById(R.id.recyclerView);
+
         initList();
         return root;
     }
 
+//     public void listSorting(){
+//        List<Task> sortList = adapter.getSortedList();
+//        adapter = new TaskAdapter(sortList);
+//
+//     }
+
     private void initList() {
-          list = new ArrayList<>();
-//        list.add(new Task("Rahat",""));
+        list = new ArrayList<>();
+////        list.add(new Task("Rahat",""));
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(
                 new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-        adapter = new TaskAdapter(list);
+        adapter = new TaskAdapter();
+        adapter.addList(list);
         recyclerView.setAdapter(adapter);
+
+
         adapter.setOnItemClickListener(new OnItemClickListener() {
 
 
             @Override
             public void onClick(int position) {
-                Intent intent = new Intent(getContext(),Form_Activity.class);
-                intent.putExtra("HomeFragmentTask",list.get(position));
-                startActivityForResult(intent,200);
+                Task task = list.get(position);
+                Intent intent = new Intent(getContext(), Form_Activity.class);
+                intent.putExtra("HomeFragmentTask", task);
+                startActivity(intent);
                 Log.d("HomeFragment", "onClick: " + task.getDesc() + task.getTitle());
-                pos = position;
-
-
-
-
+                //pos = position;
 
 
 //                Toast.makeText(getContext(),"pos = " + position, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void onLongClick(int position) {
+                pos = position;
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Внимание");
+                builder.setMessage("Вы точно хотите удалить запись");
+                builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Task task = list.get(pos);
+                        App.getDataBase().taskDao().delete(task);
+                    }
+                });
+                builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+
         });
+        App.getDataBase().taskDao().getAll().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasks) {
+                notSortedList = tasks;
+                list.clear();
+                list.addAll(tasks);
+                adapter.notifyDataSetChanged();
+            }
+
+        });
+        App.getDataBase().taskDao().getSortedList().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasks) {
+                sortedList = tasks;
+            }
+        });
+
+
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == 100) {
-            task = (Task) data.getSerializableExtra("task");
-            Log.wtf("tag", "title: " + task.getTitle());
-            list.add(0,task);
+    public static void setNotSortedList(){
+        list.clear();
+        list.addAll(notSortedList);
+        adapter.notifyDataSetChanged();
+
+    }
+
+    public static void setSortedList() {
+
+            list.clear();
+            list.addAll(sortedList);
             adapter.notifyDataSetChanged();
 
-        }else if (resultCode == Activity.RESULT_OK && requestCode == 200){
-            Task task = (Task) data.getSerializableExtra("task");
-            list.set(pos,task);
-            adapter.notifyDataSetChanged();
-        }
+
+
+
+
+        //        Collections.sort(list, new Comparator<Task>() {
+//            @Override
+//            public int compare(Task o1, Task o2) {
+//
+//                return o1.getTitle().compareTo(o2.getTitle());
+//            }
+//        });
+
     }
+
+
+
 }
+
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK && requestCode == 100) {
+//            task = (Task) data.getSerializableExtra("task");
+//            Log.wtf("tag", "title: " + task.getTitle());
+//            list.add(0,task);
+//            adapter.notifyDataSetChanged();
+//
+//        }else if (resultCode == Activity.RESULT_OK && requestCode == 200){
+//            Task task = (Task) data.getSerializableExtra("task");
+//            list.set(pos,task);
+//            adapter.notifyDataSetChanged();
+//        }
+//    }

@@ -15,7 +15,7 @@ public class Form_Activity extends AppCompatActivity {
 
     private EditText editTitle;
     private EditText description;
-    Task task;
+    private Task task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,24 +25,28 @@ public class Form_Activity extends AppCompatActivity {
         editTitle = findViewById(R.id.editTitle);
         description = findViewById(R.id.description);
         task = (Task) getIntent().getSerializableExtra("HomeFragmentTask");
-        if (task != null){
-
-            editTitle.setText(task.getTitle(),TextView.BufferType.EDITABLE);
-            description.setText(task.getDesc(),TextView.BufferType.EDITABLE);}
+        if (task != null) {
+            editTitle.setText(task.getTitle(), TextView.BufferType.EDITABLE);
+            description.setText(task.getDesc(), TextView.BufferType.EDITABLE);
         }
-
-
-
+    }
 
 
     public void onSave(View view) {
         String title = editTitle.getText().toString().trim();
         String desc = description.getText().toString().trim();
         Intent intent = new Intent();
-        Task task = new Task(title, desc);
-        intent.putExtra("task", task);
-        setResult(RESULT_OK, intent);
-        finish();
+        if (task != null) {
+            task.setTitle(title);
+            task.setDesc(desc);
+            App.getDataBase().taskDao().update(task);
+        } else {
+            task = new Task(title, desc);
+            App.getDataBase().taskDao().insert(task);
+        }
+//        intent.putExtra("task", task);
+//        setResult(RESULT_OK, intent);
+            finish();
 
     }
 

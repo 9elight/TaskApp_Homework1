@@ -6,15 +6,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -22,6 +19,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.taskapp.onBoard.OnBoardActivity;
+import com.taskapp.ui.home.HomeFragment;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -30,9 +28,17 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 
+import java.util.List;
+
+import static com.taskapp.ui.home.HomeFragment.setNotSortedList;
+import static com.taskapp.ui.home.HomeFragment.setSortedList;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+
+    boolean flag;
 
 
     @Override
@@ -40,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences preferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         boolean isShown = preferences.getBoolean("isShown", false);
-        if (!isShown){
+
+
+        if (!isShown) {
             startActivity(new Intent(this, OnBoardActivity.class));
             finish();
             return;
@@ -52,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(MainActivity.this,Form_Activity.class),100);
+                startActivityForResult(new Intent(MainActivity.this, Form_Activity.class), 100);
 
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
@@ -90,11 +98,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.exit:
                 SharedPreferences preferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
                 preferences.edit().putBoolean("isShown", false).apply();
                 finish();
+            case R.id.sort:
+                if (flag == false){
+                    setSortedList();
+                    flag = true;
+                    Log.e("tag", "onOptionsItemSelected: +" );
+                }else {
+                    setNotSortedList();
+                    flag = false;
+                    Log.e("Tag", "onOptionsItemSelected: " );
+                }
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -104,14 +123,15 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-            fragment.getChildFragmentManager().getFragments().get(0).onActivityResult(requestCode,resultCode,data);
 
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+//            fragment.getChildFragmentManager().getFragments().get(0).onActivityResult(requestCode,resultCode,data);
+//
+//    }
 }
