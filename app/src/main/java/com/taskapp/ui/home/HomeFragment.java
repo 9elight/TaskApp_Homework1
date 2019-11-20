@@ -1,21 +1,14 @@
 package com.taskapp.ui.home;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -32,11 +25,8 @@ import com.taskapp.TaskAdapter;
 import com.taskapp.interfaces.OnItemClickListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment {
 
@@ -64,11 +54,7 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
-//     public void listSorting(){
-//        List<Task> sortList = adapter.getSortedList();
-//        adapter = new TaskAdapter(sortList);
-//
-//     }
+
 
     private void initList() {
         list = new ArrayList<>();
@@ -108,7 +94,9 @@ public class HomeFragment extends Fragment {
                 builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         Task task = list.get(pos);
+
                         App.getDataBase().taskDao().delete(task);
                     }
                 });

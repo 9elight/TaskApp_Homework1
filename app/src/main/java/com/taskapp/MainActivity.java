@@ -1,6 +1,8 @@
 package com.taskapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.taskapp.onBoard.OnBoardActivity;
 import com.taskapp.ui.home.HomeFragment;
 
@@ -50,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (!isShown) {
             startActivity(new Intent(this, OnBoardActivity.class));
+            finish();
+            return;
+        }
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null){
+            startActivity(new Intent(this,PhoneActivity.class));
             finish();
             return;
         }
@@ -113,6 +122,28 @@ public class MainActivity extends AppCompatActivity {
                     flag = false;
                     Log.e("Tag", "onOptionsItemSelected: " );
                 }
+                break;
+            case R.id.action_sign_out:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Внимание!!");
+                builder.setMessage("Вы точно зотите выйти с аккаунта?");
+                builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FirebaseAuth.getInstance().signOut();
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+                break;
+
 
         }
         return super.onOptionsItemSelected(item);

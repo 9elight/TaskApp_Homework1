@@ -61,14 +61,14 @@ public class BoardFragment extends Fragment {
                 imageView.setImageResource(R.drawable.moon);
                 buttonStart.setVisibility(View.INVISIBLE);
 
-                view.setBackgroundColor(Color.CYAN);
+
                 view.setBackgroundResource(R.drawable.backgrround_gradient2);
                 break;
             case 2:
                 textView.setText("Что делаешь?");
                 textView2.setText("Описание");
                 imageView.setImageResource(R.drawable.mars);
-                view.setBackgroundColor(Color.RED);
+
                 view.setBackgroundResource(R.drawable.backgrround_gradient3);
 
                 break;
