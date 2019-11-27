@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -21,6 +22,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.taskapp.onBoard.OnBoardActivity;
 import com.taskapp.ui.home.HomeFragment;
 
@@ -30,6 +35,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -40,6 +47,12 @@ import static com.taskapp.ui.home.HomeFragment.setSortedList;
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private TextView editName;
+    private TextView editEmail;
+    private String name;
+    private String email;
+
+
 
     boolean flag;
 
@@ -49,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences preferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         boolean isShown = preferences.getBoolean("isShown", false);
+        name = preferences.getString("name", "No name defined");
+        email = preferences.getString("email","No email defined");
+
+        Log.e("nameEmail", "onCreate: " + name + email );
+
+
+
+
 
 
         if (!isShown) {
@@ -57,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null){
-            startActivity(new Intent(this,PhoneActivity.class));
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, PhoneActivity.class));
             finish();
             return;
         }
@@ -77,6 +98,19 @@ public class MainActivity extends AppCompatActivity {
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        View header = navigationView.getHeaderView(0);
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(MainActivity.this, ProfileActivity.class), 100);
+            }
+        });
+
+        TextView editName = header.findViewById(R.id.editHeaderName);
+        TextView editEmail = header.findViewById(R.id.editHeaderEmail);
+        editName.setText(name);
+        editEmail.setText(email);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -94,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         if (task != null || description != null) {
             Log.d("tag", task + " " + description);
         }
+
+
     }
 
     @Override
@@ -113,14 +149,14 @@ public class MainActivity extends AppCompatActivity {
                 preferences.edit().putBoolean("isShown", false).apply();
                 finish();
             case R.id.sort:
-                if (flag == false){
+                if (flag == false) {
                     setSortedList();
                     flag = true;
-                    Log.e("tag", "onOptionsItemSelected: +" );
-                }else {
+                    Log.e("tag", "onOptionsItemSelected: +");
+                } else {
                     setNotSortedList();
                     flag = false;
-                    Log.e("Tag", "onOptionsItemSelected: " );
+                    Log.e("Tag", "onOptionsItemSelected: ");
                 }
                 break;
             case R.id.action_sign_out:
@@ -157,7 +193,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    @Override
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == 100) {
+            editName = findViewById(R.id.editHeaderName);
+            editEmail = findViewById(R.id.editHeaderEmail);
+
+            editName.setText(data.getStringExtra("name"));
+            editEmail.setText(data.getStringExtra("email"));
+
+
+
+        }
+
+    }
+
+
+    //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //

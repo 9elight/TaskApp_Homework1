@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.taskapp.App;
 import com.taskapp.Form_Activity;
 import com.taskapp.R;
@@ -98,6 +101,15 @@ public class HomeFragment extends Fragment {
                         Task task = list.get(pos);
 
                         App.getDataBase().taskDao().delete(task);
+
+                        String taskId = FirebaseAuth.getInstance().getUid();
+
+                        FirebaseFirestore.getInstance().collection("tasks").document(taskId).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+
+                            }
+                        });
                     }
                 });
                 builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {

@@ -4,39 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".PhoneActivity"
-    >
+    tools:context=".ProfileActivity">
+    <ImageView
+        android:id="@+id/headerImg"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@mipmap/ic_launcher_round"
+        android:onClick="onImgClick"/>
 
     <EditText
-        android:id="@+id/editPhone"
+        android:id="@+id/editName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        />
-    <Button
-        android:id="@+id/continueButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onClickPhone"
-        android:text="Продолжить" />
-
+        android:layout_marginTop="16dp"/>
     <EditText
-        android:id="@+id/editSmsCode"
+        android:id="@+id/editMail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:visibility="gone"/>
-
-
+        android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/confirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onConfirmClick"
-        android:text="Подтвердить"
-        android:visibility="gone"/>
-
+        android:layout_marginTop="16dp"
+        android:onClick="onClick"
+        android:text="save"/>
 </LinearLayout>

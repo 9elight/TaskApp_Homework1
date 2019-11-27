@@ -28,9 +28,8 @@ public class PhoneActivity extends AppCompatActivity {
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     private Button confirmCodeButton;
     private Button continueButton;
-    private String codeSent;
-    private ProgressBar loading;
-    private PhoneAuthCredential phoneCredential;
+    private String verificationId;
+    private boolean isCodeSent;
 
 
     @Override
@@ -46,11 +45,13 @@ public class PhoneActivity extends AppCompatActivity {
             @Override
             public void onVerificationCompleted(@NonNull final PhoneAuthCredential phoneAuthCredential) {
 
-                Log.e("tag", "onVerificationCompleted: " + phoneAuthCredential.getSmsCode() );
-                if (editSmsCode.equals(phoneAuthCredential.getSmsCode())){
-                    Toast.makeText(PhoneActivity.this, "Успешно", Toast.LENGTH_SHORT).show();
-                }
-
+//                Log.e("tag", "onVerificationCompleted: " + phoneAuthCredential.getSmsCode() );
+//                if (editSmsCode.equals(phoneAuthCredential.getSmsCode())){
+//                    Toast.makeText(PhoneActivity.this, "Успешно", Toast.LENGTH_SHORT).show();
+//                }
+                    if (!isCodeSent){
+                        signIn(phoneAuthCredential);
+                    }
 
 
             }
@@ -64,7 +65,8 @@ public class PhoneActivity extends AppCompatActivity {
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
 
-                codeSent = s;
+                verificationId = s;
+                isCodeSent = true;
 
 
             }
@@ -89,14 +91,16 @@ public class PhoneActivity extends AppCompatActivity {
                 });
     }
 
-    public void onClick(View view) {
-        editPhone.setVisibility(View.GONE);
-        editSmsCode.setVisibility(View.VISIBLE);
-        String phone = editPhone.getText().toString();
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phone, 60,
-                TimeUnit.SECONDS, this, callbacks);
-        continueButton.setVisibility(View.GONE);
-        confirmCodeButton.setVisibility(View.VISIBLE);
+    public void onClickPhone(View view) {
+
+            editPhone.setVisibility(View.GONE);
+            editSmsCode.setVisibility(View.VISIBLE);
+            String phone = editPhone.getText().toString();
+            PhoneAuthProvider.getInstance().verifyPhoneNumber(phone, 60,
+                    TimeUnit.SECONDS, this, callbacks);
+            continueButton.setVisibility(View.GONE);
+            confirmCodeButton.setVisibility(View.VISIBLE);
+
 
 
 
@@ -111,7 +115,7 @@ public class PhoneActivity extends AppCompatActivity {
 
     public void onConfirmClick(View view) {
         String code = editSmsCode.getText().toString();
-        phoneCredential = PhoneAuthProvider.getCredential(codeSent,code);
+        PhoneAuthCredential phoneCredential = PhoneAuthProvider.getCredential(verificationId,code);
         signIn(phoneCredential);
     }
 }
