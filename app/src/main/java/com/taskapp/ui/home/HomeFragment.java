@@ -89,8 +89,8 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onLongClick(int position) {
-                pos = position;
+            public void onLongClick(final int position) {
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Внимание");
                 builder.setMessage("Вы точно хотите удалить запись");
@@ -98,13 +98,13 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        Task task = list.get(pos);
+//                        Task task = list.get(position);
 
-                        App.getDataBase().taskDao().delete(task);
+                        App.getDataBase().taskDao().delete(list.get(position));
 
-                        String taskId = FirebaseAuth.getInstance().getUid();
 
-                        FirebaseFirestore.getInstance().collection("tasks").document(taskId).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                        FirebaseFirestore.getInstance().collection("tasks").document(list.get(position).getId()).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
 

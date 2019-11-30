@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.util.Log;
@@ -15,6 +19,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -26,6 +31,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.taskapp.onBoard.OnBoardActivity;
 import com.taskapp.ui.home.HomeFragment;
 
@@ -49,8 +56,10 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private TextView editName;
     private TextView editEmail;
+    private ImageView headerImg;
     private String name;
     private String email;
+    private Uri uril;
 
 
 
@@ -66,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
         email = preferences.getString("email","No email defined");
 
         Log.e("nameEmail", "onCreate: " + name + email );
-
 
 
 
@@ -106,11 +114,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(new Intent(MainActivity.this, ProfileActivity.class), 100);
             }
         });
-
+        String imgId = FirebaseAuth.getInstance().getUid();
         TextView editName = header.findViewById(R.id.editHeaderName);
         TextView editEmail = header.findViewById(R.id.editHeaderEmail);
+        headerImg = header.findViewById(R.id.headerImage);
+
+        setImages();
         editName.setText(name);
         editEmail.setText(email);
+
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -202,15 +215,26 @@ public class MainActivity extends AppCompatActivity {
 
             editName.setText(data.getStringExtra("name"));
             editEmail.setText(data.getStringExtra("email"));
-
+            setImages();
 
 
         }
 
     }
+    private void setImages(){
+
+        StorageReference storage = FirebaseStorage.getInstance().getReference();
+        String userId = FirebaseAuth.getInstance().getUid();
+        storage.child("images/" + userId).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(MainActivity.this).load(uri).into(headerImg);
+            }
+        });
+    }
 
 
-    //    @Override
+//        @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 //

@@ -1,22 +1,20 @@
 package com.taskapp;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import com.google.firebase.firestore.Exclude;
 
 import java.io.Serializable;
 @Entity
 public class Task implements Serializable {
-    @PrimaryKey(autoGenerate = true)
-    private long id;
+
+    @NonNull
+    @PrimaryKey
+    private String id;
     private String title;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     private String desc;
 
@@ -39,5 +37,13 @@ public class Task implements Serializable {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -49,9 +49,11 @@ public class PhoneActivity extends AppCompatActivity {
 //                if (editSmsCode.equals(phoneAuthCredential.getSmsCode())){
 //                    Toast.makeText(PhoneActivity.this, "Успешно", Toast.LENGTH_SHORT).show();
 //                }
-                    if (!isCodeSent){
-                        signIn(phoneAuthCredential);
-                    }
+                if (isCodeSent) {
+
+                } else {
+                    signIn(phoneAuthCredential);
+                }
 
 
             }
@@ -93,21 +95,25 @@ public class PhoneActivity extends AppCompatActivity {
 
     public void onClickPhone(View view) {
 
-            editPhone.setVisibility(View.GONE);
-            editSmsCode.setVisibility(View.VISIBLE);
-            String phone = editPhone.getText().toString();
-            PhoneAuthProvider.getInstance().verifyPhoneNumber(phone, 60,
-                    TimeUnit.SECONDS, this, callbacks);
-            continueButton.setVisibility(View.GONE);
-            confirmCodeButton.setVisibility(View.VISIBLE);
 
+        String phone = editPhone.getText().toString();
+        if (phone.isEmpty()){
+            editPhone.setError("Номер не введен");
+            editPhone.requestFocus();
+            return;
+        }
 
-
-
-
-
-
-
+        if (phone.length() < 10){
+            editPhone.setError("Неправильный номер телефона");
+            editPhone.requestFocus();
+            return;
+        }
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(phone, 60,
+                TimeUnit.SECONDS, this, callbacks);
+        editPhone.setVisibility(View.GONE);
+        editSmsCode.setVisibility(View.VISIBLE);
+        continueButton.setVisibility(View.GONE);
+        confirmCodeButton.setVisibility(View.VISIBLE);
 
 
     }
@@ -115,7 +121,12 @@ public class PhoneActivity extends AppCompatActivity {
 
     public void onConfirmClick(View view) {
         String code = editSmsCode.getText().toString();
-        PhoneAuthCredential phoneCredential = PhoneAuthProvider.getCredential(verificationId,code);
+        if (code.isEmpty()){
+            editSmsCode.setError("СМС код не введен");
+            editSmsCode.requestFocus();
+            return;
+        }
+        PhoneAuthCredential phoneCredential = PhoneAuthProvider.getCredential(verificationId, code);
         signIn(phoneCredential);
     }
 }

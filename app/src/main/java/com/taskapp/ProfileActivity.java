@@ -14,8 +14,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,6 +28,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,13 +40,18 @@ public class ProfileActivity extends AppCompatActivity {
     private final int GALLERY_REQUEST = 10;
     private EditText editName;
     private EditText editEmail;
+    private ImageView headerImg;
     private Uri selectedImage;
+    private ProgressBar loading;
+    private ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editMail);
+        headerImg = findViewById(R.id.headerImg);
+        loading = findViewById(R.id.progressBar);
         loadData2();
     }
     private void loadData(){
@@ -60,20 +70,30 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-    private  void loadData2(){
-        String userId = FirebaseAuth.getInstance().getUid();
+    private  void loadData2() {
+        final String userId = FirebaseAuth.getInstance().getUid();
         FirebaseFirestore.getInstance().collection("users").document(userId)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (documentSnapshot != null){
-                    String name = documentSnapshot.getString("name");
-                    String email = documentSnapshot.getString("email");
-                    editName.setText(name);
-                    editEmail.setText(email);
-                }
-            }
-        });
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        if (documentSnapshot != null) {
+                            String name = documentSnapshot.getString("name");
+                            String email = documentSnapshot.getString("email");
+                            editName.setText(name);
+                            editEmail.setText(email);
+//
+                        }
+
+                    }
+                });
+        StorageReference storage = FirebaseStorage.getInstance().getReference();
+
+        storage.child("images/" + userId).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(ProfileActivity.this).load(uri).into(headerImg);
+                    }
+                });
     }
 
     public void onClick(View view) {
@@ -100,11 +120,16 @@ public class ProfileActivity extends AppCompatActivity {
         editor.putString("name", name);
         editor.putString("email", email);
         editor.apply();
+//        Bitmap image = imageView.getDrawingCache();
+//        Bundle extras = new Bundle();
+//        extras.putParcelable("imageBitmap",image);
+//        imageView.buildDrawingCache();
+//        intent.putExtras(extras);
 
         Intent intent = new Intent();
         intent.putExtra("name",name);
         intent.putExtra("email",email);
-//        intent.putExtra("img",selectedImage);
+
         setResult(RESULT_OK,intent);
         finish();
 
@@ -121,9 +146,12 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ImageView imageView = findViewById(R.id.headerImg);
-        selectedImage = data.getData();
-        imageView.setImageURI(selectedImage);
+        if(resultCode == RESULT_OK && requestCode == GALLERY_REQUEST) {
+            imageView = findViewById(R.id.headerImg);
+            selectedImage = data.getData();
+            imageView.setImageURI(selectedImage);
+            upload(data.getData());
+        }
 //        Bitmap bitmap = null;
 //        ImageView imageView = findViewById(R.id.headerImg);
 //        if (resultCode == RESULT_OK && requestCode == GALLERY_REQUEST){
@@ -136,5 +164,25 @@ public class ProfileActivity extends AppCompatActivity {
 //            }
 //            imageView.setImageBitmap(bitmap);
 //        }
+
+    }
+
+    private void upload(Uri uri) {
+
+        loading.setVisibility(View.VISIBLE);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        String userId = FirebaseAuth.getInstance().getUid();
+        StorageReference reference = storage.getReference().child("images/" + userId);
+        UploadTask uploadTask = reference.putFile(uri);
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()){
+                    Toaster.show("Успешно");
+                    loading.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
     }
 }
