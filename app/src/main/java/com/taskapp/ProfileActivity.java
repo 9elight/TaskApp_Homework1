@@ -18,6 +18,8 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -54,22 +56,22 @@ public class ProfileActivity extends AppCompatActivity {
         loading = findViewById(R.id.progressBar);
         loadData2();
     }
-    private void loadData(){
-        String userId = FirebaseAuth.getInstance().getUid();
-        FirebaseFirestore.getInstance().collection("users").document(userId).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null){
-                    String name = task.getResult().getString("name");
-                    String email = task.getResult().getString("email");
-                    editName.setText(name);
-                    editEmail.setText(email);
-
-                }
-            }
-        });
-    }
+//    private void loadData(){
+//        String userId = FirebaseAuth.getInstance().getUid();
+//        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful() && task.getResult() != null){
+//                    String name = task.getResult().getString("name");
+//                    String email = task.getResult().getString("email");
+//                    editName.setText(name);
+//                    editEmail.setText(email);
+//
+//                }
+//            }
+//        });
+//    }
     private  void loadData2() {
         final String userId = FirebaseAuth.getInstance().getUid();
         FirebaseFirestore.getInstance().collection("users").document(userId)
@@ -91,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
         storage.child("images/" + userId).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Glide.with(ProfileActivity.this).load(uri).into(headerImg);
+                        Glide.with(ProfileActivity.this).load(uri).apply(RequestOptions.bitmapTransform(new RoundedCorners(14))).into(headerImg);
                     }
                 });
     }
@@ -120,11 +122,6 @@ public class ProfileActivity extends AppCompatActivity {
         editor.putString("name", name);
         editor.putString("email", email);
         editor.apply();
-//        Bitmap image = imageView.getDrawingCache();
-//        Bundle extras = new Bundle();
-//        extras.putParcelable("imageBitmap",image);
-//        imageView.buildDrawingCache();
-//        intent.putExtras(extras);
 
         Intent intent = new Intent();
         intent.putExtra("name",name);
@@ -152,18 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
             imageView.setImageURI(selectedImage);
             upload(data.getData());
         }
-//        Bitmap bitmap = null;
-//        ImageView imageView = findViewById(R.id.headerImg);
-//        if (resultCode == RESULT_OK && requestCode == GALLERY_REQUEST){
-//            Uri selectedImage = data.getData();
-//
-//            try {
-//                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),selectedImage);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            imageView.setImageBitmap(bitmap);
-//        }
+
 
     }
 

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.taskapp.R;
 
 public class GalleryFragment extends Fragment {
@@ -30,6 +31,8 @@ public class GalleryFragment extends Fragment {
                 textView.setText(s);
             }
         });
+
+        LottieAnimationView animationView = root.findViewById(R.id.lottie_anim);
         return root;
     }
 }
